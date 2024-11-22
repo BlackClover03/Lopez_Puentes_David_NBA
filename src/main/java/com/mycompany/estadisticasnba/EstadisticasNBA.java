@@ -225,6 +225,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
 
         libroExcel.close();
     }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Insertar_datos;
