@@ -53,7 +53,9 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         NombreJugador = new javax.swing.JTextField();
         T_2Puntos = new javax.swing.JSpinner();
         T_3Puntos = new javax.swing.JSpinner();
-        T_totales = new javax.swing.JSpinner();
+        T_3PuntosMetidos = new javax.swing.JSpinner();
+        jLabel5 = new javax.swing.JLabel();
+        T_2PuntosMetidos = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -67,10 +69,10 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
 
         jLabel3.setText("Tiros de 3 puntos");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, -1, -1));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
 
-        jLabel4.setText("Tiros totales");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
+        jLabel4.setText("Tiros de 3 metidos");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
 
         Insertar_datos.setText("Insertar datos");
         Insertar_datos.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -87,8 +89,12 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         });
         jPanel1.add(NombreJugador, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 50, 110, 30));
         jPanel1.add(T_2Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 90, -1, -1));
-        jPanel1.add(T_3Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 120, -1, -1));
-        jPanel1.add(T_totales, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, -1, -1));
+        jPanel1.add(T_3Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, -1, -1));
+        jPanel1.add(T_3PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 180, -1, -1));
+
+        jLabel5.setText("Tiros de 2 metidos");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, -1, -1));
+        jPanel1.add(T_2PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 120, -1, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 380, 290));
 
@@ -99,19 +105,21 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         String nombreJugador = NombreJugador.getText();
         int tiros2 = (int) T_2Puntos.getValue();
         int tiros3 = (int) T_3Puntos.getValue();
-        int tirosTotales = (int) T_totales.getValue();
+        int tirosMetidos2 = (int) T_2PuntosMetidos.getValue();
+        int tirosMetidos3 = (int) T_3PuntosMetidos.getValue();
 
-        if (tirosTotales == 0) {
-            javax.swing.JOptionPane.showMessageDialog(this, "El número de tiros totales no puede ser 0.");
+        if (tirosMetidos2 == 0 || tirosMetidos3 == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "El número de tiros metidos no puede ser 0.");
             return;
         }
 
+        int tirosTotales = tirosMetidos2 + tirosMetidos3;
         double porcentajeFG = ((double) (tiros2 + tiros3) / tirosTotales) * 100;
         double porcentajeEFG = ((double) (tiros2 + 1.5 * tiros3) / tirosTotales) * 100;
 
         String[][] datos = {
             {nombreJugador, String.valueOf(tiros2), String.valueOf(tiros3),
-             String.valueOf(tirosTotales), String.format("%.2f", porcentajeFG),
+             String.valueOf(tirosMetidos2), String.valueOf(tirosMetidos3), String.format("%.2f", porcentajeFG),
              String.format("%.2f", porcentajeEFG)}
         };
 
@@ -184,11 +192,12 @@ public class EstadisticasNBA extends javax.swing.JFrame {
             fila.createCell(0).setCellValue("Nombre Jugador");
             fila.createCell(1).setCellValue("Nº Tiros de 2");
             fila.createCell(2).setCellValue("Nº Tiros de 3");
-            fila.createCell(3).setCellValue("Tiros Totales");
-            fila.createCell(4).setCellValue("%FG");
-            fila.createCell(5).setCellValue("%eFG");
+            fila.createCell(3).setCellValue("Tiros de 2 metidos");
+            fila.createCell(4).setCellValue("Tiros de 3 metidos");
+            fila.createCell(5).setCellValue("%FG");
+            fila.createCell(6).setCellValue("%eFG");
 
-            fila.setHeightInPoints(60);
+            fila.setHeightInPoints(25);
 
             ultimaFila = 1;
         }
@@ -213,9 +222,9 @@ public class EstadisticasNBA extends javax.swing.JFrame {
             }
         }
 
-        hoja.setColumnWidth(0, 30 * 256);
-        hoja.setColumnHidden(2, true);
-        hoja.autoSizeColumn(1);
+       for (int col = 0;col < datos[0].length; col++){
+           hoja.setColumnWidth(col, 20*256);
+       }
 
         try (FileOutputStream salida = new FileOutputStream(nombreArchivo)) {
             libroExcel.write(salida);
@@ -231,12 +240,14 @@ public class EstadisticasNBA extends javax.swing.JFrame {
     private javax.swing.JButton Insertar_datos;
     private javax.swing.JTextField NombreJugador;
     private javax.swing.JSpinner T_2Puntos;
+    private javax.swing.JSpinner T_2PuntosMetidos;
     private javax.swing.JSpinner T_3Puntos;
-    private javax.swing.JSpinner T_totales;
+    private javax.swing.JSpinner T_3PuntosMetidos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
