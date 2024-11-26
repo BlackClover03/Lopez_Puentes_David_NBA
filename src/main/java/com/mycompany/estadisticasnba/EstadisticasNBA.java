@@ -56,6 +56,10 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         T_3PuntosMetidos = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
         T_2PuntosMetidos = new javax.swing.JSpinner();
+        jLabel6 = new javax.swing.JLabel();
+        T_Libres = new javax.swing.JSpinner();
+        jLabel7 = new javax.swing.JLabel();
+        T_LibresMetidos = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -80,7 +84,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
                 Insertar_datosMouseClicked(evt);
             }
         });
-        jPanel1.add(Insertar_datos, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 110, 30));
+        jPanel1.add(Insertar_datos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 380, 110, 30));
 
         NombreJugador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -96,7 +100,15 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, -1, -1));
         jPanel1.add(T_2PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 120, -1, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 380, 290));
+        jLabel6.setText("Tiros Libres metidos");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, -1, -1));
+        jPanel1.add(T_Libres, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 210, -1, -1));
+
+        jLabel7.setText("Tiros Libres");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, -1, -1));
+        jPanel1.add(T_LibresMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 240, -1, -1));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 430));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -105,10 +117,12 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         String nombreJugador = NombreJugador.getText();
         int tiros2 = (int) T_2Puntos.getValue();
         int tiros3 = (int) T_3Puntos.getValue();
+        int tirosLibres = (int) T_Libres.getValue();
         int tirosMetidos2 = (int) T_2PuntosMetidos.getValue();
         int tirosMetidos3 = (int) T_3PuntosMetidos.getValue();
+        int tirosLibresMetidos = (int) T_LibresMetidos.getValue();
 
-        if (tirosMetidos2 == 0 || tirosMetidos3 == 0) {
+        if (tirosMetidos2 == 0 || tirosMetidos3 == 0 || tirosLibresMetidos == 0) {
             javax.swing.JOptionPane.showMessageDialog(this, "El número de tiros metidos no puede ser 0.");
             return;
         }
@@ -116,11 +130,12 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         int tirosTotales = tirosMetidos2 + tirosMetidos3;
         double porcentajeFG = ((double) (tiros2 + tiros3) / tirosTotales) * 100;
         double porcentajeEFG = ((double) (tiros2 + 1.5 * tiros3) / tirosTotales) * 100;
+        double porcetajeTS = (tirosTotales / (2.0*(tirosMetidos2 + tirosMetidos3 + 0.44 * tirosLibresMetidos))) * 100;
 
         String[][] datos = {
-            {nombreJugador, String.valueOf(tiros2), String.valueOf(tiros3),
-             String.valueOf(tirosMetidos2), String.valueOf(tirosMetidos3), String.format("%.2f", porcentajeFG),
-             String.format("%.2f", porcentajeEFG)}
+            {nombreJugador, String.valueOf(tiros2), String.valueOf(tiros3),String.valueOf(tirosLibres),
+             String.valueOf(tirosMetidos2), String.valueOf(tirosMetidos3), String.valueOf(tirosLibresMetidos),
+             String.format("%.2f", porcentajeFG), String.format("%.2f", porcentajeEFG), String.format("%.2f", porcetajeTS)}
         };
 
         try {
@@ -176,13 +191,20 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         Workbook libroExcel;
         Sheet hoja;
         int ultimaFila = 0;
-        
+
         File archivoExcel = new File(nombreArchivo);
         if (archivoExcel.exists()) {
             try (FileInputStream entrada = new FileInputStream(archivoExcel)) {
                 libroExcel = new XSSFWorkbook(entrada);
                 hoja = libroExcel.getSheetAt(0);
-                ultimaFila = hoja.getLastRowNum() + 1;
+
+                ultimaFila = hoja.getLastRowNum();
+                Row ultima = hoja.getRow(ultimaFila);
+                if (ultima != null && ultima.getCell(0) != null &&
+                    "Promedios".equals(ultima.getCell(0).getStringCellValue())) {
+                    hoja.removeRow(ultima);
+                    ultimaFila--;
+                }
             }
         } else {
             libroExcel = new XSSFWorkbook();
@@ -192,14 +214,16 @@ public class EstadisticasNBA extends javax.swing.JFrame {
             fila.createCell(0).setCellValue("Nombre Jugador");
             fila.createCell(1).setCellValue("Nº Tiros de 2");
             fila.createCell(2).setCellValue("Nº Tiros de 3");
-            fila.createCell(3).setCellValue("Tiros de 2 metidos");
-            fila.createCell(4).setCellValue("Tiros de 3 metidos");
-            fila.createCell(5).setCellValue("%FG");
-            fila.createCell(6).setCellValue("%eFG");
+            fila.createCell(3).setCellValue("Nº Tiros Libres");
+            fila.createCell(4).setCellValue("Tiros de 2 metidos");
+            fila.createCell(5).setCellValue("Tiros de 3 metidos");
+            fila.createCell(6).setCellValue("Tiros Libres metidos");
+            fila.createCell(7).setCellValue("%FG");
+            fila.createCell(8).setCellValue("%eFG");
+            fila.createCell(9).setCellValue("%TS");
 
             fila.setHeightInPoints(25);
-
-            ultimaFila = 1;
+            ultimaFila = 0;
         }
 
         CellStyle estilo = libroExcel.createCellStyle();
@@ -214,17 +238,56 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         estilo.setVerticalAlignment(VerticalAlignment.TOP);
 
         for (int i = 0; i < datos.length; i++) {
-            Row fila = hoja.createRow(ultimaFila + i);
+            Row fila = hoja.createRow(ultimaFila + 1 + i);
             for (int j = 0; j < datos[i].length; j++) {
                 Cell celda = fila.createCell(j);
                 celda.setCellValue(datos[i][j]);
                 celda.setCellStyle(estilo);
             }
         }
+        ultimaFila = hoja.getLastRowNum();
 
-       for (int col = 0;col < datos[0].length; col++){
-           hoja.setColumnWidth(col, 20*256);
-       }
+        double sumaTiros2 = 0, sumaTiros3 = 0, sumaLibres = 0, sumaMetidos2 = 0, sumaMetidos3 = 0, sumaMetidosLibres = 0;
+        double sumaFG = 0, sumaEFG = 0, sumaTS = 0;
+        int filasDatos = 0;
+
+        for (int i = 1; i <= ultimaFila; i++) {
+            Row fila = hoja.getRow(i);
+            if (fila != null) {
+                sumaTiros2 += getNumericValue(fila.getCell(1));
+                sumaTiros3 += getNumericValue(fila.getCell(2));
+                sumaLibres += getNumericValue(fila.getCell(3));
+                sumaMetidos2 += getNumericValue(fila.getCell(4));
+                sumaMetidos3 += getNumericValue(fila.getCell(5));
+                sumaMetidosLibres += getNumericValue(fila.getCell(6));
+                sumaFG += getNumericValue(fila.getCell(7));
+                sumaEFG += getNumericValue(fila.getCell(8));
+                sumaTS += getNumericValue(fila.getCell(9));
+                filasDatos++;
+            }
+        }
+
+        if (filasDatos > 0) {
+            double mediaFG = sumaFG / filasDatos;
+            double mediaEFG = sumaEFG / filasDatos;
+            double mediaTS = sumaTS / filasDatos;
+
+            Row filaMedias = hoja.createRow(ultimaFila + 1);
+            filaMedias.createCell(0).setCellValue("Promedios");
+            filaMedias.createCell(1).setCellValue(sumaTiros2 / filasDatos);
+            filaMedias.createCell(2).setCellValue(sumaTiros3 / filasDatos);
+            filaMedias.createCell(3).setCellValue(sumaLibres / filasDatos);
+            filaMedias.createCell(4).setCellValue(sumaMetidos2 / filasDatos);
+            filaMedias.createCell(5).setCellValue(sumaMetidos3 / filasDatos);
+            filaMedias.createCell(6).setCellValue(sumaMetidosLibres / filasDatos);
+            filaMedias.createCell(7).setCellValue(mediaFG);
+            filaMedias.createCell(8).setCellValue(mediaEFG);
+            filaMedias.createCell(9).setCellValue(mediaTS);
+        }
+
+        for (int col = 0; col < datos[0].length; col++) {
+            hoja.setColumnWidth(col, 20 * 256);
+        }
 
         try (FileOutputStream salida = new FileOutputStream(nombreArchivo)) {
             libroExcel.write(salida);
@@ -234,6 +297,25 @@ public class EstadisticasNBA extends javax.swing.JFrame {
 
         libroExcel.close();
     }
+
+    private static double getNumericValue(Cell cell) {
+        if (cell == null) {
+            return 0;
+        }
+        switch (cell.getCellType()) {
+            case NUMERIC:
+                return cell.getNumericCellValue();
+            case STRING:
+                try {
+                    return Double.parseDouble(cell.getStringCellValue());
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+            default:
+                return 0;
+        }
+    }
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -243,11 +325,15 @@ public class EstadisticasNBA extends javax.swing.JFrame {
     private javax.swing.JSpinner T_2PuntosMetidos;
     private javax.swing.JSpinner T_3Puntos;
     private javax.swing.JSpinner T_3PuntosMetidos;
+    private javax.swing.JSpinner T_Libres;
+    private javax.swing.JSpinner T_LibresMetidos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
