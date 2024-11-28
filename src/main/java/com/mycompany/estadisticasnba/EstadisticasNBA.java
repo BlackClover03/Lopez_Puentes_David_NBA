@@ -45,38 +45,41 @@ public class EstadisticasNBA extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         Insertar_datos = new javax.swing.JButton();
+        PanelTabuladoDatos = new javax.swing.JTabbedPane();
+        PanelDatos1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         NombreJugador = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
         T_2Puntos = new javax.swing.JSpinner();
-        T_3Puntos = new javax.swing.JSpinner();
-        T_3PuntosMetidos = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
         T_2PuntosMetidos = new javax.swing.JSpinner();
-        jLabel6 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        T_3Puntos = new javax.swing.JSpinner();
+        T_3PuntosMetidos = new javax.swing.JSpinner();
         T_Libres = new javax.swing.JSpinner();
-        jLabel7 = new javax.swing.JLabel();
         T_LibresMetidos = new javax.swing.JSpinner();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        PanelDatos2 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        T_rebotes = new javax.swing.JSpinner();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        T_taponesRecibidos = new javax.swing.JSpinner();
+        T_asistencias = new javax.swing.JSpinner();
+        T_robos = new javax.swing.JSpinner();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        T_taponesAfavor = new javax.swing.JSpinner();
+        T_perdidas = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel1.setText("Nombre jugador");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, -1, -1));
-
-        jLabel2.setText("Tiros de 2 puntos");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
-
-        jLabel3.setText("Tiros de 3 puntos");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
-
-        jLabel4.setText("Tiros de 3 metidos");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
 
         Insertar_datos.setText("Insertar datos");
         Insertar_datos.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -86,27 +89,88 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         });
         jPanel1.add(Insertar_datos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 380, 110, 30));
 
+        PanelTabuladoDatos.setMinimumSize(new java.awt.Dimension(100, 100));
+
+        PanelDatos1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel1.setText("Nombre jugador");
+        PanelDatos1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 16, 110, 20));
+
         NombreJugador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 NombreJugadorActionPerformed(evt);
             }
         });
-        jPanel1.add(NombreJugador, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 50, 110, 30));
-        jPanel1.add(T_2Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 90, -1, -1));
-        jPanel1.add(T_3Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, -1, -1));
-        jPanel1.add(T_3PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 180, -1, -1));
+        PanelDatos1.add(NombreJugador, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 10, 110, 30));
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setText("Tiros de 2 puntos");
+        PanelDatos1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 130, 30));
+        PanelDatos1.add(T_2Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 100, 30));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setText("Tiros de 2 metidos");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, -1, -1));
-        jPanel1.add(T_2PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 120, -1, -1));
+        PanelDatos1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(236, 50, 140, 30));
+        PanelDatos1.add(T_2PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 50, 100, 30));
 
-        jLabel6.setText("Tiros Libres metidos");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, -1, -1));
-        jPanel1.add(T_Libres, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 210, -1, -1));
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setText("Tiros de 3 puntos");
+        PanelDatos1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 130, 30));
 
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel4.setText("Tiros de 3 metidos");
+        PanelDatos1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 90, 140, 30));
+        PanelDatos1.add(T_3Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 90, 100, 30));
+        PanelDatos1.add(T_3PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 90, 100, 30));
+        PanelDatos1.add(T_Libres, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 130, 100, 30));
+        PanelDatos1.add(T_LibresMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 130, 100, 30));
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel7.setText("Tiros Libres");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, -1, -1));
-        jPanel1.add(T_LibresMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 240, -1, -1));
+        PanelDatos1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 130, 30));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setText("Tiros Libres metidos");
+        PanelDatos1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 130, 140, 30));
+
+        PanelTabuladoDatos.addTab("Datos1", PanelDatos1);
+
+        PanelDatos2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel8.setText("Tapones a favor");
+        PanelDatos2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 100, 30));
+        PanelDatos2.add(T_rebotes, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 20, 100, 30));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel9.setText("Tapones reibidos");
+        PanelDatos2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 60, 120, 30));
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel10.setText("Asistencias");
+        PanelDatos2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 100, 30));
+
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel11.setText("Robos");
+        PanelDatos2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 100, 30));
+        PanelDatos2.add(T_taponesRecibidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 60, 100, 30));
+        PanelDatos2.add(T_asistencias, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 60, 100, 30));
+        PanelDatos2.add(T_robos, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 100, 100, 30));
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel12.setText("Rebotes");
+        PanelDatos2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 100, 30));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel13.setText("Perdidas");
+        PanelDatos2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 20, 100, 30));
+        PanelDatos2.add(T_taponesAfavor, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 140, 100, 30));
+        PanelDatos2.add(T_perdidas, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 20, 100, 30));
+
+        PanelTabuladoDatos.addTab("Datos2", PanelDatos2);
+
+        jPanel1.add(PanelTabuladoDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 360));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 430));
 
@@ -121,6 +185,15 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         int tirosMetidos2 = (int) T_2PuntosMetidos.getValue();
         int tirosMetidos3 = (int) T_3PuntosMetidos.getValue();
         int tirosLibresMetidos = (int) T_LibresMetidos.getValue();
+        int Puntos = tirosMetidos2 + tirosMetidos3 + tirosLibresMetidos;
+        int Rebotes = (int) T_rebotes.getValue();
+        int Asistencias = (int) T_asistencias.getValue();
+        int Robos = (int) T_robos.getValue();
+        int TaponesFavor = (int) T_taponesAfavor.getValue();
+        int Perdidas = (int) T_perdidas.getValue();
+        int TaponesRecibidos = (int) T_taponesRecibidos.getValue();
+        int TirosFallados = (tiros2 + tiros3 + tirosLibres) - Puntos;
+        int TirosLibresFallados = tirosLibres - tirosLibresMetidos;
 
         if (tirosMetidos2 == 0 || tirosMetidos3 == 0 || tirosLibresMetidos == 0) {
             javax.swing.JOptionPane.showMessageDialog(this, "El número de tiros metidos no puede ser 0.");
@@ -131,11 +204,12 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         double porcentajeFG = ((double) (tiros2 + tiros3) / tirosTotales) * 100;
         double porcentajeEFG = ((double) (tiros2 + 1.5 * tiros3) / tirosTotales) * 100;
         double porcetajeTS = (tirosTotales / (2.0*(tirosMetidos2 + tirosMetidos3 + 0.44 * tirosLibresMetidos))) * 100;
+        double Valoracion = (Puntos + Rebotes + Asistencias + Robos + TaponesFavor) - (TirosFallados + TirosLibresFallados + Perdidas + TaponesRecibidos);
 
         String[][] datos = {
             {nombreJugador, String.valueOf(tiros2), String.valueOf(tiros3),String.valueOf(tirosLibres),
              String.valueOf(tirosMetidos2), String.valueOf(tirosMetidos3), String.valueOf(tirosLibresMetidos),
-             String.format("%.2f", porcentajeFG), String.format("%.2f", porcentajeEFG), String.format("%.2f", porcetajeTS)}
+             String.format("%.2f", porcentajeFG), String.format("%.2f", porcentajeEFG), String.format("%.2f", porcetajeTS), String.valueOf(Valoracion)}
         };
 
         try {
@@ -221,6 +295,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
             fila.createCell(7).setCellValue("%FG");
             fila.createCell(8).setCellValue("%eFG");
             fila.createCell(9).setCellValue("%TS");
+            fila.createCell(10).setCellValue("Valoracion");
 
             fila.setHeightInPoints(25);
             ultimaFila = 0;
@@ -248,7 +323,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
         ultimaFila = hoja.getLastRowNum();
 
         double sumaTiros2 = 0, sumaTiros3 = 0, sumaLibres = 0, sumaMetidos2 = 0, sumaMetidos3 = 0, sumaMetidosLibres = 0;
-        double sumaFG = 0, sumaEFG = 0, sumaTS = 0;
+        double sumaFG = 0, sumaEFG = 0, sumaTS = 0, sumaValoracion = 0;
         int filasDatos = 0;
 
         for (int i = 1; i <= ultimaFila; i++) {
@@ -263,6 +338,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
                 sumaFG += getNumericValue(fila.getCell(7));
                 sumaEFG += getNumericValue(fila.getCell(8));
                 sumaTS += getNumericValue(fila.getCell(9));
+                sumaValoracion += getNumericValue(fila.getCell(10));
                 filasDatos++;
             }
         }
@@ -271,6 +347,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
             double mediaFG = sumaFG / filasDatos;
             double mediaEFG = sumaEFG / filasDatos;
             double mediaTS = sumaTS / filasDatos;
+            double mediaValoracion = sumaValoracion / filasDatos;
 
             Row filaMedias = hoja.createRow(ultimaFila + 1);
             filaMedias.createCell(0).setCellValue("Promedios");
@@ -283,6 +360,7 @@ public class EstadisticasNBA extends javax.swing.JFrame {
             filaMedias.createCell(7).setCellValue(mediaFG);
             filaMedias.createCell(8).setCellValue(mediaEFG);
             filaMedias.createCell(9).setCellValue(mediaTS);
+            filaMedias.createCell(10).setCellValue(mediaValoracion);
         }
 
         for (int col = 0; col < datos[0].length; col++) {
@@ -321,19 +399,34 @@ public class EstadisticasNBA extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Insertar_datos;
     private javax.swing.JTextField NombreJugador;
+    private javax.swing.JPanel PanelDatos1;
+    private javax.swing.JPanel PanelDatos2;
+    private javax.swing.JTabbedPane PanelTabuladoDatos;
     private javax.swing.JSpinner T_2Puntos;
     private javax.swing.JSpinner T_2PuntosMetidos;
     private javax.swing.JSpinner T_3Puntos;
     private javax.swing.JSpinner T_3PuntosMetidos;
     private javax.swing.JSpinner T_Libres;
     private javax.swing.JSpinner T_LibresMetidos;
+    private javax.swing.JSpinner T_asistencias;
+    private javax.swing.JSpinner T_perdidas;
+    private javax.swing.JSpinner T_rebotes;
+    private javax.swing.JSpinner T_robos;
+    private javax.swing.JSpinner T_taponesAfavor;
+    private javax.swing.JSpinner T_taponesRecibidos;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
