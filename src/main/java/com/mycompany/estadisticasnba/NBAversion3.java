@@ -12,6 +12,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.awt.Color;
+import java.io.IOException;
+import javax.swing.JFrame;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  *
@@ -68,6 +78,7 @@ public class NBAversion3 extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         T_taponesAfavor = new javax.swing.JSpinner();
         T_perdidas = new javax.swing.JSpinner();
+        btn_grafica = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -93,7 +104,7 @@ public class NBAversion3 extends javax.swing.JFrame {
                 Btn_guardarActionPerformed(evt);
             }
         });
-        getContentPane().add(Btn_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 360, 150, 40));
+        getContentPane().add(Btn_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 150, 40));
 
         PanelTabuladoDatos.setMinimumSize(new java.awt.Dimension(100, 100));
 
@@ -166,6 +177,14 @@ public class NBAversion3 extends javax.swing.JFrame {
         PanelTabuladoDatos.addTab("Datos2", PanelDatos2);
 
         getContentPane().add(PanelTabuladoDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 490, 220));
+
+        btn_grafica.setText("Grafica");
+        btn_grafica.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btn_graficaMouseClicked(evt);
+            }
+        });
+        getContentPane().add(btn_grafica, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 360, 140, 40));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -265,6 +284,121 @@ public class NBAversion3 extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_Btn_guardarActionPerformed
+
+    private void btn_graficaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_graficaMouseClicked
+        String equipoSeleccionado = (String) equiposBox.getSelectedItem();
+        String jugadorSeleccionado = (String) jugadoresBox.getSelectedItem();
+
+        if (equipoSeleccionado == null || jugadorSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona un equipo y un jugador.");
+            return;
+        }
+
+        File archivoExcel = new File(equipoSeleccionado + ".xlsx");
+        if (!archivoExcel.exists()) {
+            JOptionPane.showMessageDialog(this, "El archivo del equipo seleccionado no existe.");
+            return;
+        }
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        try (FileInputStream fis = new FileInputStream(archivoExcel)) {
+            Workbook libro = new XSSFWorkbook(fis);
+            Sheet hoja = libro.getSheet(jugadorSeleccionado);
+
+            if (hoja == null) {
+                JOptionPane.showMessageDialog(this, "No hay datos para el jugador seleccionado.");
+                return;
+            }
+
+            Row encabezado = hoja.getRow(0); // Encabezados de las columnas
+            if (encabezado == null) {
+                JOptionPane.showMessageDialog(this, "No hay encabezados en la hoja del jugador.");
+                return;
+            }
+
+            // Identificar las columnas relevantes
+            int colTiros2 = -1;
+            int colTiros3 = -1;
+            int colTirosLibres = -1;
+
+            for (int i = 0; i < encabezado.getLastCellNum(); i++) {
+                String categoria = encabezado.getCell(i).getStringCellValue();
+                switch (categoria) {
+                    case "Tiros de 2 Metidos":
+                        colTiros2 = i;
+                        break;
+                    case "Tiros de 3 Metidos":
+                        colTiros3 = i;
+                        break;
+                    case "Libres Metidos":
+                        colTirosLibres = i;
+                        break;
+                }
+            }
+
+            if (colTiros2 == -1 || colTiros3 == -1 || colTirosLibres == -1) {
+                JOptionPane.showMessageDialog(this, "No se encontraron todas las columnas necesarias (tiros2, tiros3, tirosLibres).");
+                return;
+            }
+
+            // Procesar las filas de datos (partidos)
+            for (int i = 1; i <= hoja.getLastRowNum(); i++) { // Comenzar en la fila 1 (saltar encabezado)
+                Row fila = hoja.getRow(i);
+                if (fila == null) continue;
+
+                try {
+                    int tirosMetidos2 = (int) fila.getCell(colTiros2).getNumericCellValue();
+                    int tirosMetidos3 = (int) fila.getCell(colTiros3).getNumericCellValue();
+                    int tirosLibresMetidos = (int) fila.getCell(colTirosLibres).getNumericCellValue();
+
+                    // Calcular puntos totales del partido
+                    int puntosTotales = tirosMetidos2 + tirosMetidos3 + tirosLibresMetidos;
+
+                    // Añadir al dataset
+                    dataset.addValue(puntosTotales, "Puntos", "Partido " + i);
+                } catch (Exception e) {
+                    System.err.println("Error al procesar la fila " + i + ": " + e.getMessage());
+                }
+            }
+
+            libro.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al leer el archivo Excel: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
+        // Crear el gráfico
+        JFreeChart grafico = ChartFactory.createBarChart(
+            "Puntos por Partido de " + jugadorSeleccionado, // Título
+            "Partidos",                                    // Etiqueta del eje X
+            "Puntos",                                      // Etiqueta del eje Y
+            dataset                                        // Datos
+        );
+
+        // Personalizar el gráfico
+        CategoryPlot plot = grafico.getCategoryPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, Color.BLUE); // Cambiar el color de las barras a azul
+
+        // Mostrar el gráfico en una nueva ventana
+        JFrame frame = new JFrame("Gráfico de Puntos por Partido");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.add(new ChartPanel(grafico));
+        frame.setVisible(true);
+
+        // Guardar el gráfico como archivo JPG
+        try {
+            File archivo = new File("grafico_puntos_" + jugadorSeleccionado + ".jpg");
+            ChartUtils.saveChartAsJPEG(archivo, grafico, 800, 600);
+            JOptionPane.showMessageDialog(this, "Gráfico guardado como: " + archivo.getAbsolutePath());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar el gráfico: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btn_graficaMouseClicked
 
     
     private void actualizarJugadores() {
@@ -394,6 +528,7 @@ public class NBAversion3 extends javax.swing.JFrame {
     private javax.swing.JSpinner T_robos;
     private javax.swing.JSpinner T_taponesAfavor;
     private javax.swing.JSpinner T_taponesRecibidos;
+    private javax.swing.JButton btn_grafica;
     private javax.swing.JComboBox<String> equiposBox;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
