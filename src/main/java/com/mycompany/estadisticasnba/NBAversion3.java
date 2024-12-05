@@ -12,15 +12,17 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import java.awt.Color;
 import java.io.IOException;
 import javax.swing.JFrame;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
@@ -300,7 +302,9 @@ public class NBAversion3 extends javax.swing.JFrame {
             return;
         }
 
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        DefaultCategoryDataset datasetBarras = new DefaultCategoryDataset();
+        DefaultCategoryDataset datasetLinea = new DefaultCategoryDataset();
+        DefaultCategoryDataset datasetRebotes = new DefaultCategoryDataset();
 
         try (FileInputStream fis = new FileInputStream(archivoExcel)) {
             Workbook libro = new XSSFWorkbook(fis);
@@ -311,16 +315,13 @@ public class NBAversion3 extends javax.swing.JFrame {
                 return;
             }
 
-            Row encabezado = hoja.getRow(0); // Encabezados de las columnas
+            Row encabezado = hoja.getRow(0);
             if (encabezado == null) {
                 JOptionPane.showMessageDialog(this, "No hay encabezados en la hoja del jugador.");
                 return;
             }
 
-            // Identificar las columnas relevantes
-            int colTiros2 = -1;
-            int colTiros3 = -1;
-            int colTirosLibres = -1;
+            int colTiros2 = -1, colTiros3 = -1, colTirosLibres = -1, colRebotes = -1;
 
             for (int i = 0; i < encabezado.getLastCellNum(); i++) {
                 String categoria = encabezado.getCell(i).getStringCellValue();
@@ -334,16 +335,21 @@ public class NBAversion3 extends javax.swing.JFrame {
                     case "Libres Metidos":
                         colTirosLibres = i;
                         break;
+                    case "Rebotes":
+                        colRebotes = i;
+                        break;
                 }
             }
 
-            if (colTiros2 == -1 || colTiros3 == -1 || colTirosLibres == -1) {
-                JOptionPane.showMessageDialog(this, "No se encontraron todas las columnas necesarias (tiros2, tiros3, tirosLibres).");
+            if (colTiros2 == -1 || colTiros3 == -1 || colTirosLibres == -1 || colRebotes == -1) {
+                JOptionPane.showMessageDialog(this, "No se encontraron todas las columnas necesarias.");
                 return;
             }
 
-            // Procesar las filas de datos (partidos)
-            for (int i = 1; i <= hoja.getLastRowNum(); i++) { // Comenzar en la fila 1 (saltar encabezado)
+            int totalPuntos = 0;
+            int numPartidos = 0;
+
+            for (int i = 1; i <= hoja.getLastRowNum(); i++) {
                 Row fila = hoja.getRow(i);
                 if (fila == null) continue;
 
@@ -351,51 +357,81 @@ public class NBAversion3 extends javax.swing.JFrame {
                     int tirosMetidos2 = (int) fila.getCell(colTiros2).getNumericCellValue();
                     int tirosMetidos3 = (int) fila.getCell(colTiros3).getNumericCellValue();
                     int tirosLibresMetidos = (int) fila.getCell(colTirosLibres).getNumericCellValue();
+                    int rebotes = (int) fila.getCell(colRebotes).getNumericCellValue();
 
-                    // Calcular puntos totales del partido
                     int puntosTotales = tirosMetidos2 + tirosMetidos3 + tirosLibresMetidos;
 
-                    // Añadir al dataset
-                    dataset.addValue(puntosTotales, "Puntos", "Partido " + i);
+                    datasetBarras.addValue(puntosTotales, "Puntos", "Partido " + i);
+                    datasetRebotes.addValue(rebotes, "Rebotes", "Partido " + i);
+
+                    totalPuntos += puntosTotales;
+                    numPartidos++;
                 } catch (Exception e) {
                     System.err.println("Error al procesar la fila " + i + ": " + e.getMessage());
                 }
             }
 
-            libro.close();
+            double mediaPuntos = numPartidos > 0 ? (double) totalPuntos / numPartidos : 0;
+
+            // Añadir la media como línea
+            for (int i = 1; i <= numPartidos; i++) {
+                datasetLinea.addValue(mediaPuntos, "Media", "Partido " + i);
+            }
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al leer el archivo Excel: " + e.getMessage());
             e.printStackTrace();
             return;
         }
 
-        // Crear el gráfico
-        JFreeChart grafico = ChartFactory.createBarChart(
-            "Puntos por Partido de " + jugadorSeleccionado, // Título
-            "Partidos",                                    // Etiqueta del eje X
-            "Puntos",                                      // Etiqueta del eje Y
-            dataset                                        // Datos
-        );
+        CategoryPlot plot = new CategoryPlot();
 
-        // Personalizar el gráfico
-        CategoryPlot plot = grafico.getCategoryPlot();
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, Color.BLUE); // Cambiar el color de las barras a azul
+        BarRenderer rendererBarras = new BarRenderer();
+        plot.setDataset(0, datasetBarras);
+        plot.setRenderer(0, rendererBarras);
+        plot.setDomainAxis(new CategoryAxis("Partidos"));
+        plot.setRangeAxis(new NumberAxis("Puntos"));
 
-        // Mostrar el gráfico en una nueva ventana
-        JFrame frame = new JFrame("Gráfico de Puntos por Partido");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.add(new ChartPanel(grafico));
-        frame.setVisible(true);
+        LineAndShapeRenderer rendererLinea = new LineAndShapeRenderer();
+        plot.setDataset(1, datasetLinea);
+        plot.setRenderer(1, rendererLinea);
 
-        // Guardar el gráfico como archivo JPG
+        JFreeChart graficoPuntos = new JFreeChart("Puntos y Media por Partido", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+
+        JFrame framePuntos = new JFrame("Gráfico de Puntos y Media por Partido");
+        framePuntos.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        framePuntos.setSize(800, 600);
+        framePuntos.add(new ChartPanel(graficoPuntos));
+        framePuntos.setVisible(true);
+
         try {
-            File archivo = new File("grafico_puntos_" + jugadorSeleccionado + ".jpg");
-            ChartUtils.saveChartAsJPEG(archivo, grafico, 800, 600);
-            JOptionPane.showMessageDialog(this, "Gráfico guardado como: " + archivo.getAbsolutePath());
+            File archivoPuntos = new File("grafico_puntos_" + jugadorSeleccionado + ".jpg");
+            ChartUtils.saveChartAsJPEG(archivoPuntos, graficoPuntos, 800, 600);
+            JOptionPane.showMessageDialog(this, "Gráfico combinado guardado como: " + archivoPuntos.getAbsolutePath());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error al guardar el gráfico: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        JFreeChart graficoRebotes = ChartFactory.createLineChart(
+            "Rebotes por Partido de " + jugadorSeleccionado,
+            "Partidos",
+            "Rebotes",
+            datasetRebotes
+        );
+
+        JFrame frameRebotes = new JFrame("Gráfico de Rebotes por Partido");
+        frameRebotes.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameRebotes.setSize(800, 600);
+        frameRebotes.add(new ChartPanel(graficoRebotes));
+        frameRebotes.setVisible(true);
+
+        try {
+            File archivoRebotes = new File("grafico_rebotes_" + jugadorSeleccionado + ".jpg");
+            ChartUtils.saveChartAsJPEG(archivoRebotes, graficoRebotes, 800, 600);
+            JOptionPane.showMessageDialog(this, "Gráfico de rebotes guardado como: " + archivoRebotes.getAbsolutePath());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar el gráfico de rebotes: " + e.getMessage());
             e.printStackTrace();
         }
     }//GEN-LAST:event_btn_graficaMouseClicked
