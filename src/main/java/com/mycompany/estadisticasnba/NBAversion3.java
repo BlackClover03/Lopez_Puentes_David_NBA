@@ -24,6 +24,16 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 
 /**
  *
@@ -81,6 +91,7 @@ public class NBAversion3 extends javax.swing.JFrame {
         T_taponesAfavor = new javax.swing.JSpinner();
         T_perdidas = new javax.swing.JSpinner();
         btn_grafica = new javax.swing.JButton();
+        Btn_generarPDF = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -106,7 +117,7 @@ public class NBAversion3 extends javax.swing.JFrame {
                 Btn_guardarActionPerformed(evt);
             }
         });
-        getContentPane().add(Btn_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 150, 40));
+        getContentPane().add(Btn_guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 360, 150, 40));
 
         PanelTabuladoDatos.setMinimumSize(new java.awt.Dimension(100, 100));
 
@@ -186,7 +197,20 @@ public class NBAversion3 extends javax.swing.JFrame {
                 btn_graficaMouseClicked(evt);
             }
         });
-        getContentPane().add(btn_grafica, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 360, 140, 40));
+        getContentPane().add(btn_grafica, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 360, 140, 40));
+
+        Btn_generarPDF.setText("Generar PDF");
+        Btn_generarPDF.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Btn_generarPDFMouseClicked(evt);
+            }
+        });
+        Btn_generarPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn_generarPDFActionPerformed(evt);
+            }
+        });
+        getContentPane().add(Btn_generarPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 360, 150, 40));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -436,6 +460,119 @@ public class NBAversion3 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn_graficaMouseClicked
 
+    private void Btn_generarPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Btn_generarPDFActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Btn_generarPDFActionPerformed
+
+    private void Btn_generarPDFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Btn_generarPDFMouseClicked
+        String equipoSeleccionado = (String) equiposBox.getSelectedItem();
+        String jugadorSeleccionado = (String) jugadoresBox.getSelectedItem();
+
+        if (equipoSeleccionado == null || jugadorSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona un equipo y un jugador.");
+            return;
+        }
+
+        File archivoExcel = new File(equipoSeleccionado + ".xlsx");
+        if (!archivoExcel.exists()) {
+            JOptionPane.showMessageDialog(this, "El archivo del equipo seleccionado no existe.");
+            return;
+        }
+
+        // Variables para las estadísticas
+        double tiros2 = 0, tiros2Metidos = 0;
+        double tiros3 = 0, tiros3Metidos = 0;
+        double libres = 0, libresMetidos = 0;
+        int numPartidos = 0;
+
+        try (FileInputStream fis = new FileInputStream(archivoExcel)) {
+            Workbook libro = new XSSFWorkbook(fis);
+            Sheet hoja = libro.getSheet(jugadorSeleccionado);
+
+            if (hoja == null) {
+                JOptionPane.showMessageDialog(this, "No hay datos para el jugador seleccionado.");
+                return;
+            }
+
+            for (int i = 1; i <= hoja.getLastRowNum(); i++) {
+                Row fila = hoja.getRow(i);
+                if (fila == null) continue;
+
+                tiros2 += fila.getCell(0).getNumericCellValue();
+                tiros2Metidos += fila.getCell(1).getNumericCellValue();
+                tiros3 += fila.getCell(2).getNumericCellValue();
+                tiros3Metidos += fila.getCell(3).getNumericCellValue();
+                libres += fila.getCell(4).getNumericCellValue();
+                libresMetidos += fila.getCell(5).getNumericCellValue();
+                numPartidos++;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al leer el archivo Excel: " + e.getMessage());
+            e.printStackTrace();
+            return;
+        }
+
+        // Calcular estadísticas
+        double mediaTriples = numPartidos > 0 ? tiros3Metidos / numPartidos : 0;
+        double porcentajeFG = (tiros2 + tiros3 > 0) ? ((tiros2Metidos + tiros3Metidos) / (tiros2 + tiros3)) * 100 : 0;
+        double porcentajeEFG = (tiros2 + tiros3 > 0) ? ((tiros2Metidos + 1.5 * tiros3Metidos) / (tiros2 + tiros3)) * 100 : 0;
+        double puntosTotales = 2 * tiros2Metidos + 3 * tiros3Metidos + libresMetidos;
+        double porcentajeTS = (tiros2 + tiros3 + 0.44 * libres > 0)
+                ? (puntosTotales / (2 * (tiros2 + tiros3 + 0.44 * libres))) * 100
+                : 0;
+
+        // Crear el PDF
+        try {
+            // Crear el archivo PDF
+            String pdfFileName = jugadorSeleccionado + "_" + equipoSeleccionado + ".pdf";
+            PdfWriter writer = new PdfWriter(pdfFileName);
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+
+            // Título
+            PdfFont titleFont = PdfFontFactory.createFont();
+            Paragraph title = new Paragraph(jugadorSeleccionado + " - " + equipoSeleccionado)
+                    .setFont(titleFont)
+                    .setFontSize(18)
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER);
+            document.add(title);
+            document.add(new Paragraph("\n"));
+
+            // Añadir gráficos
+            ImageData graficoPuntosData = ImageDataFactory.create("grafico_puntos_" + jugadorSeleccionado + ".jpg");
+            Image graficoPuntos = new Image(graficoPuntosData);
+            graficoPuntos.scaleToFit(400, 200);
+            document.add(graficoPuntos);
+
+            document.add(new Paragraph("\n"));
+
+            ImageData graficoRebotesData = ImageDataFactory.create("grafico_rebotes_" + jugadorSeleccionado + ".jpg");
+            Image graficoRebotes = new Image(graficoRebotesData);
+            graficoRebotes.scaleToFit(400, 200);
+            document.add(graficoRebotes);
+
+            // Otras estadísticas
+            Paragraph stats = new Paragraph("Otras estadísticas:\n")
+                    .setFont(titleFont)
+                    .setFontSize(12)
+                    .setTextAlignment(TextAlignment.LEFT);
+            stats.add("Media de triples metidos por partido: " + String.format("%.2f", mediaTriples) + "\n");
+            stats.add("%FG: " + String.format("%.2f", porcentajeFG) + "%\n");
+            stats.add("%eFG: " + String.format("%.2f", porcentajeEFG) + "%\n");
+            stats.add("%TS: " + String.format("%.2f", porcentajeTS) + "%\n");
+            document.add(stats);
+
+            // Cerrar documento
+            document.close();
+
+            JOptionPane.showMessageDialog(this, "PDF generado: " + pdfFileName);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al generar el PDF: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_Btn_generarPDFMouseClicked
+
     
     private void actualizarJugadores() {
         String equipoSeleccionado = (String) equiposBox.getSelectedItem();
@@ -548,6 +685,7 @@ public class NBAversion3 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Btn_generarPDF;
     private javax.swing.JButton Btn_guardar;
     private javax.swing.JPanel PanelDatos1;
     private javax.swing.JPanel PanelDatos2;
