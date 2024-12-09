@@ -13,16 +13,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
-import javax.swing.JFrame;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -34,21 +27,57 @@ import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
+import java.awt.Component;
+import java.awt.Container;
 
 /**
  *
  * @author dl260
  */
 public class NBAversion3 extends javax.swing.JFrame {
-
+    private Verificacion verificacionFrame = new Verificacion();
+    private javax.swing.ButtonGroup menuButtonGroup;
+    
     /**
      * Creates new form PruebaNBAJFrame
      */
     public NBAversion3() {
         initComponents();
+        initMenuBar();
         
         equiposBox.setSelectedItem("Equipo1");
         actualizarJugadores();
+    }
+    
+    private void initMenuBar() {
+        menuButtonGroup = new javax.swing.ButtonGroup();
+
+        menuButtonGroup.add(MenuOpcionPequeno);
+        menuButtonGroup.add(MenuOpcionMediano);
+        menuButtonGroup.add(MenuOpcionGrande);
+
+        MenuOpcionPequeno.setSelected(true);
+
+        MenuOpcionPequeno.addActionListener(evt -> actualizarFuenteTextoPersonalizado(1));
+        MenuOpcionMediano.addActionListener(evt -> actualizarFuenteTextoPersonalizado(2));
+        MenuOpcionGrande.addActionListener(evt -> actualizarFuenteTextoPersonalizado(3));
+    }
+    
+    private void actualizarFuenteTextoPersonalizado(int opcionFuente) {
+        for (Component component : getContentPane().getComponents()) {
+            actualizarFuenteEnComponente(component, opcionFuente);
+        }
+    }
+
+    private void actualizarFuenteEnComponente(Component component, int opcionFuente) {
+        if (component instanceof TextoPersonalizado) {
+            TextoPersonalizado label = (TextoPersonalizado) component;
+            label.configurarEstilo(opcionFuente);
+        } else if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                actualizarFuenteEnComponente(child, opcionFuente);
+            }
+        }
     }
 
     /**
@@ -65,33 +94,39 @@ public class NBAversion3 extends javax.swing.JFrame {
         Btn_guardar = new javax.swing.JButton();
         PanelTabuladoDatos = new javax.swing.JTabbedPane();
         PanelDatos1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         T_2Puntos = new javax.swing.JSpinner();
-        jLabel5 = new javax.swing.JLabel();
         T_2PuntosMetidos = new javax.swing.JSpinner();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         T_3Puntos = new javax.swing.JSpinner();
         T_3PuntosMetidos = new javax.swing.JSpinner();
         T_Libres = new javax.swing.JSpinner();
         T_LibresMetidos = new javax.swing.JSpinner();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        textoPersonalizado1 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado2 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado3 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado4 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado5 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado6 = new com.mycompany.estadisticasnba.TextoPersonalizado();
         PanelDatos2 = new javax.swing.JPanel();
-        jLabel8 = new javax.swing.JLabel();
         T_rebotes = new javax.swing.JSpinner();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
         T_taponesRecibidos = new javax.swing.JSpinner();
         T_asistencias = new javax.swing.JSpinner();
         T_robos = new javax.swing.JSpinner();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
         T_taponesAfavor = new javax.swing.JSpinner();
         T_perdidas = new javax.swing.JSpinner();
+        textoPersonalizado7 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado8 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado9 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado10 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado11 = new com.mycompany.estadisticasnba.TextoPersonalizado();
+        textoPersonalizado12 = new com.mycompany.estadisticasnba.TextoPersonalizado();
         btn_grafica = new javax.swing.JButton();
         Btn_generarPDF = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        menuTamañoFuente = new javax.swing.JMenu();
+        MenuOpcionPequeno = new javax.swing.JRadioButtonMenuItem();
+        MenuOpcionMediano = new javax.swing.JRadioButtonMenuItem();
+        MenuOpcionGrande = new javax.swing.JRadioButtonMenuItem();
+        MenuCondiciones = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -122,70 +157,58 @@ public class NBAversion3 extends javax.swing.JFrame {
         PanelTabuladoDatos.setMinimumSize(new java.awt.Dimension(100, 100));
 
         PanelDatos1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel2.setText("Tiros de 2 puntos");
-        PanelDatos1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 130, 30));
         PanelDatos1.add(T_2Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 100, 30));
-
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel5.setText("Tiros de 2 metidos");
-        PanelDatos1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 140, 30));
         PanelDatos1.add(T_2PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 0, 100, 30));
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setText("Tiros de 3 puntos");
-        PanelDatos1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 130, 30));
-
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel4.setText("Tiros de 3 metidos");
-        PanelDatos1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 40, 140, 30));
         PanelDatos1.add(T_3Puntos, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 40, 100, 30));
         PanelDatos1.add(T_3PuntosMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 40, 100, 30));
         PanelDatos1.add(T_Libres, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 100, 30));
         PanelDatos1.add(T_LibresMetidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 80, 100, 30));
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel7.setText("Tiros Libres");
-        PanelDatos1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 130, 30));
+        textoPersonalizado1.setText("Tiros de 2 puntos");
+        PanelDatos1.add(textoPersonalizado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 130, 30));
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel6.setText("Tiros Libres metidos");
-        PanelDatos1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 80, 140, 30));
+        textoPersonalizado2.setText("Tiros de 3 puntos");
+        PanelDatos1.add(textoPersonalizado2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 130, 30));
+
+        textoPersonalizado3.setText("Tiros Libres");
+        PanelDatos1.add(textoPersonalizado3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 130, 30));
+
+        textoPersonalizado4.setText("Tiros de 2 metidos");
+        PanelDatos1.add(textoPersonalizado4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 140, 30));
+
+        textoPersonalizado5.setText("Tiros de 3 metidos");
+        PanelDatos1.add(textoPersonalizado5, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 40, 140, 30));
+
+        textoPersonalizado6.setText("Tiros Libres metidos");
+        PanelDatos1.add(textoPersonalizado6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 80, 140, 30));
 
         PanelTabuladoDatos.addTab("Datos1", PanelDatos1);
 
         PanelDatos2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        PanelDatos2.add(T_rebotes, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 100, 30));
+        PanelDatos2.add(T_taponesRecibidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 40, 100, 30));
+        PanelDatos2.add(T_asistencias, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 40, 100, 30));
+        PanelDatos2.add(T_robos, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, 100, 30));
+        PanelDatos2.add(T_taponesAfavor, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 120, 100, 30));
+        PanelDatos2.add(T_perdidas, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 0, 100, 30));
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel8.setText("Tapones a favor");
-        PanelDatos2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 120, 100, 30));
-        PanelDatos2.add(T_rebotes, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 0, 100, 30));
+        textoPersonalizado7.setText("Rebotes");
+        PanelDatos2.add(textoPersonalizado7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 130, 30));
 
-        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel9.setText("Tapones reibidos");
-        PanelDatos2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 110, 30));
+        textoPersonalizado8.setText("Asistencias");
+        PanelDatos2.add(textoPersonalizado8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 130, 30));
 
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel10.setText("Asistencias");
-        PanelDatos2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 100, 30));
+        textoPersonalizado9.setText("Robos");
+        PanelDatos2.add(textoPersonalizado9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 130, 30));
 
-        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel11.setText("Robos");
-        PanelDatos2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 100, 30));
-        PanelDatos2.add(T_taponesRecibidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 40, 100, 30));
-        PanelDatos2.add(T_asistencias, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, 100, 30));
-        PanelDatos2.add(T_robos, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 100, 30));
+        textoPersonalizado10.setText("Tapones a favor");
+        PanelDatos2.add(textoPersonalizado10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 120, 130, 30));
 
-        jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel12.setText("Rebotes");
-        PanelDatos2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 100, 30));
+        textoPersonalizado11.setText("Perdidas");
+        PanelDatos2.add(textoPersonalizado11, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, 110, 30));
 
-        jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel13.setText("Perdidas");
-        PanelDatos2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 0, 100, 30));
-        PanelDatos2.add(T_taponesAfavor, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 120, 100, 30));
-        PanelDatos2.add(T_perdidas, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 0, 100, 30));
+        textoPersonalizado12.setText("Tapones a favor");
+        PanelDatos2.add(textoPersonalizado12, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 110, 30));
 
         PanelTabuladoDatos.addTab("Datos2", PanelDatos2);
 
@@ -211,6 +234,32 @@ public class NBAversion3 extends javax.swing.JFrame {
             }
         });
         getContentPane().add(Btn_generarPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 360, 150, 40));
+
+        menuTamañoFuente.setText("Tamaño Fuente");
+
+        MenuOpcionPequeno.setSelected(true);
+        MenuOpcionPequeno.setText("Pequeño");
+        menuTamañoFuente.add(MenuOpcionPequeno);
+
+        MenuOpcionMediano.setSelected(true);
+        MenuOpcionMediano.setText("Mediano");
+        menuTamañoFuente.add(MenuOpcionMediano);
+
+        MenuOpcionGrande.setSelected(true);
+        MenuOpcionGrande.setText("Grande");
+        menuTamañoFuente.add(MenuOpcionGrande);
+
+        jMenuBar1.add(menuTamañoFuente);
+
+        MenuCondiciones.setText("Condiciones de Servicio");
+        MenuCondiciones.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                MenuCondicionesMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(MenuCondiciones);
+
+        setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -397,7 +446,6 @@ public class NBAversion3 extends javax.swing.JFrame {
 
             double mediaPuntos = numPartidos > 0 ? (double) totalPuntos / numPartidos : 0;
 
-            // Añadir la media como línea
             for (int i = 1; i <= numPartidos; i++) {
                 datasetLinea.addValue(mediaPuntos, "Media", "Partido " + i);
             }
@@ -408,54 +456,46 @@ public class NBAversion3 extends javax.swing.JFrame {
             return;
         }
 
-        CategoryPlot plot = new CategoryPlot();
-
-        BarRenderer rendererBarras = new BarRenderer();
-        plot.setDataset(0, datasetBarras);
-        plot.setRenderer(0, rendererBarras);
-        plot.setDomainAxis(new CategoryAxis("Partidos"));
-        plot.setRangeAxis(new NumberAxis("Puntos"));
-
-        LineAndShapeRenderer rendererLinea = new LineAndShapeRenderer();
-        plot.setDataset(1, datasetLinea);
-        plot.setRenderer(1, rendererLinea);
-
-        JFreeChart graficoPuntos = new JFreeChart("Puntos y Media por Partido", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-
-        JFrame framePuntos = new JFrame("Gráfico de Puntos y Media por Partido");
-        framePuntos.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        framePuntos.setSize(800, 600);
-        framePuntos.add(new ChartPanel(graficoPuntos));
-        framePuntos.setVisible(true);
-
-        try {
-            File archivoPuntos = new File("grafico_puntos_" + jugadorSeleccionado + ".jpg");
-            ChartUtils.saveChartAsJPEG(archivoPuntos, graficoPuntos, 800, 600);
-            JOptionPane.showMessageDialog(this, "Gráfico combinado guardado como: " + archivoPuntos.getAbsolutePath());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar el gráfico: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        JFreeChart graficoRebotes = ChartFactory.createLineChart(
-            "Rebotes por Partido de " + jugadorSeleccionado,
-            "Partidos",
-            "Rebotes",
-            datasetRebotes
+        JFreeChart graficoPuntos = ChartFactory.createBarChart(
+                "Puntos y Media por Partido",
+                "Partidos",
+                "Puntos",
+                datasetBarras
         );
 
-        JFrame frameRebotes = new JFrame("Gráfico de Rebotes por Partido");
-        frameRebotes.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameRebotes.setSize(800, 600);
-        frameRebotes.add(new ChartPanel(graficoRebotes));
-        frameRebotes.setVisible(true);
+        JFreeChart graficoRebotes = ChartFactory.createLineChart(
+                "Rebotes por Partido de " + jugadorSeleccionado,
+                "Partidos",
+                "Rebotes",
+                datasetRebotes
+        );
 
         try {
-            File archivoRebotes = new File("grafico_rebotes_" + jugadorSeleccionado + ".jpg");
-            ChartUtils.saveChartAsJPEG(archivoRebotes, graficoRebotes, 800, 600);
-            JOptionPane.showMessageDialog(this, "Gráfico de rebotes guardado como: " + archivoRebotes.getAbsolutePath());
+            File carpetaGraficas = new File("graficas");
+            if (!carpetaGraficas.exists()) {
+                carpetaGraficas.mkdir();
+            }
+
+            File carpetaJugador = new File(carpetaGraficas, jugadorSeleccionado);
+            if (!carpetaJugador.exists()) {
+                carpetaJugador.mkdir();
+            }
+
+            File archivoGraficoPuntos = new File(carpetaJugador, "grafico_puntos_" + jugadorSeleccionado + ".jpg");
+            if (archivoGraficoPuntos.exists()) {
+                archivoGraficoPuntos.delete();
+            }
+            ChartUtils.saveChartAsJPEG(archivoGraficoPuntos, graficoPuntos, 800, 600);
+
+            File archivoGraficoRebotes = new File(carpetaJugador, "grafico_rebotes_" + jugadorSeleccionado + ".jpg");
+            if (archivoGraficoRebotes.exists()) {
+                archivoGraficoRebotes.delete();
+            }
+            ChartUtils.saveChartAsJPEG(archivoGraficoRebotes, graficoRebotes, 800, 600);
+
+            JOptionPane.showMessageDialog(this, "Gráficas guardadas en la carpeta: " + carpetaJugador.getAbsolutePath());
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar el gráfico de rebotes: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al guardar las gráficas: " + e.getMessage());
             e.printStackTrace();
         }
     }//GEN-LAST:event_btn_graficaMouseClicked
@@ -573,7 +613,15 @@ public class NBAversion3 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_Btn_generarPDFMouseClicked
 
-    
+    private void MenuCondicionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MenuCondicionesMouseClicked
+        if (verificacionFrame == null || !verificacionFrame.isVisible()) {
+                verificacionFrame = new Verificacion();
+                verificacionFrame.setVisible(true);
+            } else {
+                verificacionFrame.toFront();
+            }
+    }//GEN-LAST:event_MenuCondicionesMouseClicked
+
     private void actualizarJugadores() {
         String equipoSeleccionado = (String) equiposBox.getSelectedItem();
         jugadoresBox.removeAllItems();
@@ -687,6 +735,10 @@ public class NBAversion3 extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Btn_generarPDF;
     private javax.swing.JButton Btn_guardar;
+    private javax.swing.JMenu MenuCondiciones;
+    private javax.swing.JRadioButtonMenuItem MenuOpcionGrande;
+    private javax.swing.JRadioButtonMenuItem MenuOpcionMediano;
+    private javax.swing.JRadioButtonMenuItem MenuOpcionPequeno;
     private javax.swing.JPanel PanelDatos1;
     private javax.swing.JPanel PanelDatos2;
     private javax.swing.JTabbedPane PanelTabuladoDatos;
@@ -704,18 +756,20 @@ public class NBAversion3 extends javax.swing.JFrame {
     private javax.swing.JSpinner T_taponesRecibidos;
     private javax.swing.JButton btn_grafica;
     private javax.swing.JComboBox<String> equiposBox;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JComboBox<String> jugadoresBox;
+    private javax.swing.JMenu menuTamañoFuente;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado1;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado10;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado11;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado12;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado2;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado3;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado4;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado5;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado6;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado7;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado8;
+    private com.mycompany.estadisticasnba.TextoPersonalizado textoPersonalizado9;
     // End of variables declaration//GEN-END:variables
 }
